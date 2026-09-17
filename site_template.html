@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-i18n="site_title">أبونيان — تحليل فاقد المياه</title>
+<style>
+  :root{
+    --ink:#1b2430; --muted:#5f6b76; --line:#e6e8eb; --soft:#f5f7f8;
+    --accent:#0f766e; --accent-soft:#e6f2f1;
+    --danger:#b4432f; --warn:#9a6a15; --ok:#2f7d52;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; color:var(--ink); background:#fff;
+    font-family:"Segoe UI",Tahoma,"Noto Sans Arabic",Arial,sans-serif;
+    font-size:15px; line-height:1.6;
+  }
+  .num{font-variant-numeric:tabular-nums;}
+  a{color:var(--accent);}
+
+  /* top bar */
+  header.topbar{
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+    padding:14px 24px; border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex; flex-direction:column; line-height:1.25; margin-inline-end:auto;}
+  .brand strong{font-size:17px;}
+  .brand span{font-size:12.5px; color:var(--muted);}
+  nav.tabs{display:flex; gap:4px;}
+  .tab{
+    border:none; background:none; font:inherit; cursor:pointer; color:var(--muted);
+    padding:8px 14px; border-radius:6px;
+  }
+  .tab:hover{background:var(--soft); color:var(--ink);}
+  .tab.active{background:var(--accent-soft); color:var(--accent); font-weight:600;}
+  .lang-btn{
+    border:1px solid var(--line); background:#fff; font:inherit; cursor:pointer;
+    color:var(--ink); padding:7px 14px; border-radius:6px;
+  }
+  .lang-btn:hover{border-color:var(--accent); color:var(--accent);}
+
+  /* layout */
+  main{max-width:1080px; margin:0 auto; padding:28px 24px 56px;}
+  .panel.hidden{display:none;}
+  h1{font-size:24px; margin:0 0 8px; font-weight:700;}
+  .lede{color:var(--muted); max-width:70ch; margin:0 0 14px;}
+  .lede b{color:var(--ink);}
+  .note{
+    background:var(--soft); border:1px solid var(--line); border-radius:8px;
+    padding:12px 14px; font-size:13.5px; color:var(--muted); margin:0 0 22px;
+  }
+  .note b{color:var(--ink);}
+  h2{font-size:17px; margin:30px 0 4px; font-weight:650;}
+  .desc{color:var(--muted); font-size:13.5px; max-width:74ch; margin:0 0 14px;}
+
+  /* KPIs */
+  .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:6px 0 8px;}
+  .kpi{border:1px solid var(--line); border-radius:8px; padding:14px 16px;}
+  .kpi .label{font-size:12.5px; color:var(--muted); margin-bottom:6px;}
+  .kpi .value{font-size:22px; font-weight:650; font-variant-numeric:tabular-nums;}
+  .kpi .sub{font-size:11.5px; color:var(--muted); margin-top:4px;}
+  .kpi.loss .value{color:var(--danger);}
+  .kpi.warn .value{color:var(--warn);}
+
+  /* cards / charts */
+  .card{border:1px solid var(--line); border-radius:8px; padding:16px;}
+  .chart-box{position:relative; direction:ltr;}
+  .legend{display:flex; gap:16px; flex-wrap:wrap; margin-top:10px; font-size:12.5px; color:var(--muted);}
+  .legend span{display:inline-flex; align-items:center; gap:6px;}
+  .sw{width:12px; height:12px; border-radius:3px; display:inline-block;}
+  .sw.line{height:3px; width:16px;}
+
+  select{
+    width:100%; max-width:360px; margin-bottom:12px; padding:9px 12px;
+    border:1px solid var(--line); border-radius:6px; font:inherit; color:var(--ink); background:#fff;
+  }
+
+  /* table */
+  .table-wrap{overflow-x:auto;}
+  table{width:100%; border-collapse:collapse; font-size:13.5px;}
+  th,td{padding:9px 10px; text-align:start; border-bottom:1px solid var(--line);}
+  th{font-size:11.5px; text-transform:uppercase; letter-spacing:.02em; color:var(--muted); font-weight:600;}
+  td.num,th.num{text-align:end; font-variant-numeric:tabular-nums;}
+  td.loss{color:var(--danger); font-weight:600;}
+  tr.active td{background:var(--accent-soft);}
+  .badge{display:inline-block; font-size:11.5px; padding:2px 8px; border-radius:4px; border:1px solid var(--line);}
+  .badge.on{background:var(--accent-soft); color:var(--accent); border-color:transparent;}
+  .badge.off{background:var(--soft); color:var(--muted);}
+
+  /* scenario toggle */
+  .seg{display:inline-flex; border:1px solid var(--line); border-radius:6px; overflow:hidden; margin-bottom:14px;}
+  .seg button{border:none; background:#fff; font:inherit; cursor:pointer; color:var(--muted); padding:8px 14px;}
+  .seg button.active{background:var(--accent); color:#fff;}
+
+  /* projections */
+  .proj{border:1px solid var(--line); border-radius:8px; padding:12px 14px; margin-bottom:10px; font-size:13.5px;}
+  .proj.active{border-color:var(--danger); background:#fdf3f1;}
+  .proj .amt{color:var(--danger); font-weight:650;}
+  .pill{font-size:11px; padding:2px 8px; border-radius:4px; margin-inline-start:6px;}
+  .pill.active{background:var(--danger); color:#fff;}
+  .pill.ok{background:var(--ok); color:#fff;}
+
+  /* sources */
+  .sources{display:grid; gap:8px;}
+  .src{border:1px solid var(--line); border-radius:6px; padding:10px 12px; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; font-size:13px;}
+  .src a{word-break:break-all;}
+
+  footer{border-top:1px solid var(--line); color:var(--muted); font-size:12.5px; text-align:center; padding:18px 24px;}
+  @media (max-width:640px){ header.topbar{gap:10px;} .brand{margin-inline-end:0; width:100%;} }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <strong data-i18n="brand">تحليل فاقد المياه</strong>
+    <span data-i18n="brand_sub">أداة تحليلية لأبونيان القابضة</span>
+  </div>
+  <nav class="tabs">
+    <button class="tab active" data-tab="real" data-i18n="nav_real">الفجوة الوطنية</button>
+    <button class="tab" data-tab="engine" data-i18n="nav_engine">كشف التسربات</button>
+    <button class="tab" data-tab="sim" data-i18n="nav_sim">محاكاة الشبكة</button>
+  </nav>
+  <button id="langToggle" class="lang-btn" type="button">English</button>
+</header>
+
+<main>
+  <!-- ============ REAL PANEL ============ -->
+  <section class="panel" data-panel="real">
+    <h1 data-i18n="r_h1">فجوة استهلاك المياه مقابل هدف رؤية 2030</h1>
+    <p class="lede" data-i18n-html="r_lede">لوحة مبنية <b>بالكامل</b> على أرقام رسمية منشورة.</p>
+    <div class="note" data-i18n-html="r_disclaimer"><b>ملاحظة:</b> القيمة المالية توضيحية.</div>
+
+    <div class="kpis">
+      <div class="kpi">
+        <div class="label" data-i18n="r_kpi1_label">الاستهلاك الزائد عن هدف 2030</div>
+        <div class="value" id="r-excess-vol">—</div>
+        <div class="sub" data-i18n="r_kpi1_sub">م³ سنويًا</div>
+      </div>
+      <div class="kpi">
+        <div class="label" data-i18n="r_kpi2_label">القيمة التوضيحية (أدنى–أعلى تعرفة)</div>
+        <div class="value" id="r-excess-value">—</div>
+        <div class="sub" data-i18n="r_kpi2_sub">0.15 – 9.00 ريال/م³</div>
+      </div>
+      <div class="kpi">
+        <div class="label" data-i18n="r_kpi3_label">فاقد الشبكة الوطني المُعلن</div>
+        <div class="value" id="r-national-loss">—</div>
+        <div class="sub" data-i18n="r_kpi3_sub">م³/يوم — تقدير منشور</div>
+      </div>
+    </div>
+
+    <h2 data-i18n="r_s1_h2">استهلاك الفرد اليومي حسب المنطقة مقابل هدف 2030</h2>
+    <p class="desc" data-i18n="r_s1_desc">الأعمدة الملوّنة أرقام منشورة بالتحديد؛ الرمادية استُخدم فيها المتوسط الوطني.</p>
+    <div class="card">
+      <div class="chart-box" style="height:360px;"><canvas id="regionChart"></canvas></div>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--accent)"></i><span data-i18n="r_lg_confirmed">رقم إقليمي مؤكَّد</span></span>
+        <span><i class="sw" style="background:var(--muted)"></i><span data-i18n="r_lg_estimate">متوسط وطني (299 لتر)</span></span>
+        <span><i class="sw line" style="background:var(--danger)"></i><span data-i18n="r_lg_target">هدف 2030 (150 لتر)</span></span>
+      </div>
+    </div>
+
+    <h2 data-i18n="r_s2_h2">جدول الفجوة الاقتصادية لكل منطقة</h2>
+    <p class="desc" data-i18n="r_s2_desc">الحجم الزائد وقيمته التوضيحية لو وصلت كل منطقة للهدف.</p>
+    <div class="card table-wrap">
+      <table>
+        <thead><tr>
+          <th data-i18n="r_th_region">المنطقة</th>
+          <th class="num" data-i18n="r_th_pop">السكان (2022)</th>
+          <th class="num" data-i18n="r_th_lpcd">لتر/فرد/يوم</th>
+          <th data-i18n="r_th_status">الحالة</th>
+          <th class="num" data-i18n="r_th_excess_lpcd">الفائض (لتر)</th>
+          <th class="num" data-i18n="r_th_excess_m3">الحجم الزائد (م³/سنة)</th>
+          <th class="num" data-i18n="r_th_val_low">أدنى تعرفة</th>
+          <th class="num" data-i18n="r_th_val_high">أعلى تعرفة</th>
+        </tr></thead>
+        <tbody id="regionTableBody"></tbody>
+      </table>
+    </div>
+
+    <h2 data-i18n="r_s3_h2">حساسية قيمة الفاقد الوطني حسب شريحة التعرفة</h2>
+    <p class="desc" data-i18n="r_s3_desc">كيف تتغيّر القيمة التوضيحية للفاقد الوطني حسب الشريحة المستخدمة.</p>
+    <div class="card">
+      <div class="seg">
+        <button class="active" data-scenario="low" data-i18n="r_scn_low">الحد الأدنى (600 ألف م³/يوم)</button>
+        <button data-scenario="high" data-i18n="r_scn_high">الحد الأعلى (800 ألف م³/يوم)</button>
+      </div>
+      <div class="chart-box" style="height:320px;"><canvas id="nationalChart"></canvas></div>
+    </div>
+
+    <h2 data-i18n="r_sources_h2">المصادر</h2>
+    <div class="sources" id="sourcesList"></div>
+  </section>
+
+  <!-- ============ ENGINE PANEL ============ -->
+  <section class="panel hidden" data-panel="engine">
+    <h1 data-i18n="e_h1">كشف التسربات وأثرها المالي</h1>
+    <p class="lede" data-i18n="e_intro">يحوّل قراءات العدادات اليومية إلى خسارة بالريال وتوقّع مستقبلي.</p>
+
+    <div class="kpis">
+      <div class="kpi loss">
+        <div class="label" data-i18n="e_kpi_loss">إجمالي الخسائر (ريال)</div>
+        <div class="value" id="e-loss">—</div>
+      </div>
+      <div class="kpi">
+        <div class="label" data-i18n="e_kpi_days">أيام التسرب المكتشفة</div>
+        <div class="value" id="e-days">—</div>
+      </div>
+      <div class="kpi warn">
+        <div class="label" data-i18n="e_kpi_proj30">الخسارة المتوقعة خلال 30 يوم (ريال)</div>
+        <div class="value" id="e-proj30">—</div>
+      </div>
+      <div class="kpi">
+        <div class="label" data-i18n="e_kpi_excess">المياه المهدرة (م³)</div>
+        <div class="value" id="e-excess">—</div>
+      </div>
+      <div class="kpi">
+        <div class="label" data-i18n="e_kpi_zones">المواقع المتأثرة</div>
+        <div class="value" id="e-zones">—</div>
+      </div>
+    </div>
+
+    <h2 data-i18n="e_c1_h2">الاستهلاك الفعلي مقابل الأساس المتوقع</h2>
+    <p class="desc" data-i18n="e_c1_sub">اختر موقعًا — العلامات الحمراء أيام رُصد فيها تسرب محتمل.</p>
+    <div class="card">
+      <select id="zoneSelect" aria-label="site"></select>
+      <div class="chart-box" style="height:320px;"><canvas id="consChart"></canvas></div>
+      <div class="legend">
+        <span><i class="sw line" style="background:var(--danger)"></i><span data-i18n="e_lg_actual">الاستهلاك الفعلي</span></span>
+        <span><i class="sw line" style="background:var(--accent)"></i><span data-i18n="e_lg_baseline">الأساس المتوقع</span></span>
+        <span>✕ <span data-i18n="e_lg_leak">تسرب مكتشف</span></span>
+      </div>
+    </div>
+
+    <h2 data-i18n="e_summary_h2">ملخص الخسائر حسب الموقع</h2>
+    <div class="card table-wrap">
+      <table>
+        <thead><tr>
+          <th data-i18n="e_th_site">الموقع</th>
+          <th class="num" data-i18n="e_th_days">أيام التسرب</th>
+          <th class="num" data-i18n="e_th_loss">الخسارة (ريال)</th>
+        </tr></thead>
+        <tbody id="summaryBody"></tbody>
+      </table>
+    </div>
+
+    <h2 data-i18n="e_proj_h2">توقع خسارة 30 يوم القادمة</h2>
+    <p class="desc" data-i18n="e_proj_sub">إسقاط الخسارة لو استمر أي تسرب نشط دون معالجة.</p>
+    <div id="projList"></div>
+
+    <div class="note" data-i18n="e_note" style="margin-top:22px;">بيانات محاكاة توضيحية — وليست بيانات تشغيلية حقيقية.</div>
+  </section>
+
+  <!-- ============ SIMULATION PANEL ============ -->
+  <section class="panel hidden" data-panel="sim">
+    <h1 data-i18n="s_h1">محاكاة الشبكة الذكية — الطريق لرؤية 2030</h1>
+    <p class="lede" data-i18n="s_intro">بيئة مُنمذجة لشريحة من الرياض: مصدر → مضخات → مناطق توزيع → عدّاد لكل منزل.</p>
+    <div class="note" data-i18n-html="s_note"><b>مبنية على دراسات حقيقية:</b> سكان الرياض، استهلاك الفرد 352.7 لتر، والتعرفة الرسمية.</div>
+
+    <div class="kpis">
+      <div class="kpi">
+        <div class="label" data-i18n="s_kpi_input">إجمالي الضخّ اليومي (م³)</div>
+        <div class="value" id="s-input">—</div>
+      </div>
+      <div class="kpi">
+        <div class="label" data-i18n="s_kpi_billed">المفوتَر عند المنازل (م³)</div>
+        <div class="value" id="s-billed">—</div>
+      </div>
+      <div class="kpi loss">
+        <div class="label" data-i18n="s_kpi_loss">الفاقد اليومي (م³)</div>
+        <div class="value" id="s-loss">—</div>
+      </div>
+      <div class="kpi warn">
+        <div class="label" data-i18n="s_kpi_losspct">نسبة الفاقد</div>
+        <div class="value" id="s-losspct">—</div>
+      </div>
+      <div class="kpi">
+        <div class="label" data-i18n="s_kpi_lpcd">استهلاك الفرد مقابل 150</div>
+        <div class="value" id="s-lpcd">—</div>
+      </div>
+    </div>
+
+    <h2 data-i18n="s_bal_h2">الميزان المائي حسب المنطقة</h2>
+    <p class="desc" data-i18n="s_bal_desc">ماء دخل المنطقة (من المضخة) − مجموع عدادات المنازل = الفاقد. تجاوز 15% يُطلق إنذارًا ويحصر التسرب في تلك المنطقة.</p>
+    <div class="card">
+      <div class="chart-box" style="height:300px;"><canvas id="balanceChart"></canvas></div>
+    </div>
+    <div class="card table-wrap" style="margin-top:16px;">
+      <table>
+        <thead><tr>
+          <th data-i18n="s_th_dma">المنطقة</th>
+          <th class="num" data-i18n="s_th_pop">السكان</th>
+          <th class="num" data-i18n="s_th_houses">المنازل</th>
+          <th class="num" data-i18n="s_th_lpcd">لتر/فرد/يوم</th>
+          <th class="num" data-i18n="s_th_input">الضخّ (م³/يوم)</th>
+          <th class="num" data-i18n="s_th_billed">المفوتَر (م³/يوم)</th>
+          <th class="num" data-i18n="s_th_losspct">الفاقد %</th>
+          <th data-i18n="s_th_status">الحالة</th>
+        </tr></thead>
+        <tbody id="dmaBody"></tbody>
+      </table>
+    </div>
+
+    <h2 data-i18n="s_vision_h2">الطريق لتحقيق رؤية 2030</h2>
+    <p class="desc" data-i18n="s_vision_desc">لو خفّضنا الاستهلاك إلى 150 لتر/فرد والفاقد إلى 10%، كم نوفّر؟</p>
+    <div class="card">
+      <div id="visionText" style="margin-bottom:14px; line-height:1.9;"></div>
+      <div class="chart-box" style="height:220px;"><canvas id="visionChart"></canvas></div>
+    </div>
+
+    <h2 data-i18n="s_sensor_h2">عيّنة من بيانات الحساسات (كيف تُربط)</h2>
+    <p class="desc" data-i18n="s_sensor_desc">كل حساس يبعث سلسلة زمنية. المسار: حساس → NB-IoT/LoRaWAN → MQTT → قاعدة بيانات زمنية → المحرك → اللوحة.</p>
+    <div class="card table-wrap">
+      <div style="font-size:12.5px; color:var(--muted); margin-bottom:6px;" data-i18n="s_sensor_house">عدّادات المنازل</div>
+      <table><thead><tr><th>timestamp</th><th>meter_id</th><th>house_id</th><th>dma</th><th class="num">reading_m³</th><th class="num">flow_lpm</th><th>status</th></tr></thead><tbody id="sensorHouse"></tbody></table>
+      <div style="font-size:12.5px; color:var(--muted); margin:14px 0 6px;" data-i18n="s_sensor_pump">المضخات</div>
+      <table><thead><tr><th>timestamp</th><th>pump_id</th><th>dma</th><th class="num">flow_out_m³h</th><th class="num">pressure_bar</th><th class="num">power_kw</th><th class="num">vibration</th><th>status</th></tr></thead><tbody id="sensorPump"></tbody></table>
+    </div>
+    <div class="note" data-i18n="s_footer_note" style="margin-top:22px;">بيئة محاكاة لإثبات المفهوم — الأرقام مبنية على دراسات حقيقية لكن التوزيع على المناطق مُنمذج.</div>
+  </section>
+</main>
+
+<footer data-i18n="footer">مُعد كأداة تحليل تمهيدية لعرض Abunayyan Holding.</footer>
+
+<script type="application/json" id="real-data">__REAL_DATA__</script>
+<script type="application/json" id="engine-data">__ENGINE_DATA__</script>
+<script type="application/json" id="network-data">__NETWORK_DATA__</script>
+<script src="vendor/chart.umd.min.js"></script>
+<script>
+(function(){
+  const REAL = JSON.parse(document.getElementById('real-data').textContent);
+  const ENGINE = JSON.parse(document.getElementById('engine-data').textContent);
+  const NET = JSON.parse(document.getElementById('network-data').textContent);
+
+  const I18N = {
+    ar: {
+      site_title:"أبونيان — تحليل فاقد المياه",
+      brand:"تحليل فاقد المياه", brand_sub:"أداة تحليلية لأبونيان القابضة",
+      nav_real:"الفجوة الوطنية", nav_engine:"كشف التسربات", lang_other:"English",
+      footer:"مُعد كأداة تحليل تمهيدية لعرض Abunayyan Holding — بيانات حقيقية منشورة في قسم «الفجوة الوطنية»، ومحاكاة توضيحية في قسم «كشف التسربات».",
+      // real
+      r_h1:"فجوة استهلاك المياه بين المناطق السعودية وهدف رؤية 2030",
+      r_lede:"هذه اللوحة مبنية <b>بالكامل</b> على أرقام رسمية منشورة: تعداد السكان 2022، استهلاك الفرد من دراسة محكّمة، التعرفة الرسمية، وتقدير حكومي لفاقد الشبكة. كل رقم مصدره في قسم المصادر.",
+      r_disclaimer:"<b>ملاحظة منهجية:</b> «القيمة المالية» توضيحية = الحجم الزائد × تعرفة رسمية — وليست إيرادات ضائعة موثّقة من شركة معينة، لأن الفاقد غير مفوتَر.",
+      r_kpi1_label:"الاستهلاك الزائد وطنيًا عن هدف 2030", r_kpi1_sub:"م³ سنويًا (تعداد 2022)",
+      r_kpi2_label:"القيمة التوضيحية (أدنى–أعلى تعرفة)", r_kpi2_sub:"0.15 – 9.00 ريال/م³",
+      r_kpi3_label:"فاقد الشبكة الوطني المُعلن رسميًا", r_kpi3_sub:"م³/يوم — تقدير منشور",
+      r_s1_h2:"استهلاك الفرد اليومي حسب المنطقة مقابل هدف 2030",
+      r_s1_desc:"الأعمدة الملوّنة أرقام منشورة بالتحديد لكل منطقة؛ الرمادية مناطق استُخدم فيها المتوسط الوطني الحقيقي بدل اختراع رقم.",
+      r_lg_confirmed:"رقم إقليمي مؤكَّد ومنشور", r_lg_estimate:"متوسط وطني (299 لتر)", r_lg_target:"هدف 2030 (150 لتر/فرد/يوم)",
+      r_s2_h2:"جدول الفجوة الاقتصادية لكل منطقة",
+      r_s2_desc:"الحجم الزائد وقيمته التوضيحية لو وصلت كل منطقة إلى هدف 150 لتر/فرد/يوم، حسب سكانها وتعرفتين حقيقيتين.",
+      r_th_region:"المنطقة", r_th_pop:"السكان (2022)", r_th_lpcd:"لتر/فرد/يوم", r_th_status:"الحالة",
+      r_th_excess_lpcd:"الفائض عن الهدف (لتر)", r_th_excess_m3:"الحجم الزائد (م³/سنة)",
+      r_th_val_low:"القيمة عند أدنى تعرفة", r_th_val_high:"القيمة عند أعلى تعرفة",
+      r_s3_h2:"حساسية القيمة الاقتصادية للفاقد الوطني حسب شريحة التعرفة",
+      r_s3_desc:"تقدير رسمي للفاقد الوطني بين 600 و800 ألف م³/يوم. الرسم يوضّح كيف تتغيّر قيمته التوضيحية حسب الشريحة.",
+      r_scn_low:"الحد الأدنى (600 ألف م³/يوم)", r_scn_high:"الحد الأعلى (800 ألف م³/يوم)",
+      r_sources_h2:"المصادر",
+      r_badge_on:"مؤكَّد", r_badge_off:"متوسط وطني",
+      r_axis_lpcd:"لتر/فرد/يوم", r_axis_value:"القيمة السنوية التوضيحية (ريال)",
+      r_target_line:"هدف 2030: 150 لتر", r_per_year:"ريال/سنة",
+      u_billion:"مليار", u_million:"مليون", u_sar:"ريال", u_m3:"م³",
+      // engine
+      e_h1:"كشف التسربات وأثرها المالي",
+      e_intro:"يبني خط أساس لكل موقع من ماضيه، يكشف الشذوذ إحصائيًا واقتصاديًا، ويحوّله خسارة بالريال مع توقّع 30 يوم.",
+      e_kpi_loss:"إجمالي الخسائر المالية (ريال)", e_kpi_days:"أيام التسرب المكتشفة",
+      e_kpi_proj30:"الخسارة المتوقعة خلال 30 يوم (ريال)", e_kpi_excess:"إجمالي المياه المهدرة (م³)", e_kpi_zones:"المواقع المتأثرة",
+      e_c1_h2:"الاستهلاك الفعلي مقابل الأساس المتوقع",
+      e_c1_sub:"اختر موقعًا لعرض بيانات عدّاده — العلامات الحمراء أيام رُصد فيها تسرب محتمل.",
+      e_lg_actual:"الاستهلاك الفعلي", e_lg_baseline:"الأساس المتوقع", e_lg_leak:"تسرب مكتشف",
+      e_summary_h2:"ملخص الخسائر حسب الموقع",
+      e_th_site:"الموقع", e_th_days:"أيام التسرب", e_th_loss:"الخسارة (ريال)",
+      e_proj_h2:"توقع خسارة 30 يوم القادمة", e_proj_sub:"إسقاط الخسارة لو استمر أي تسرب نشط دون معالجة.",
+      e_proj_active:"تسرب نشط", e_proj_ok:"لا يوجد تسرب نشط", e_proj_text:"خسارة إضافية متوقعة خلال 30 يوم:",
+      e_note:"📊 بيانات محاكاة توضيحية لأربعة مواقع افتراضية (نافذة 90 يوم تنتهي اليوم) — وليست بيانات تشغيلية حقيقية.",
+      e_tip_loss:"الخسارة",
+      nav_sim:"محاكاة الشبكة",
+      s_h1:"محاكاة الشبكة الذكية — الطريق لرؤية 2030",
+      s_intro:"بيئة مُنمذجة لشريحة من الرياض: مصدر → مضخات → مناطق توزيع (DMA) → عدّاد لكل منزل، مع حساب الميزان المائي.",
+      s_note:"<b>مبنية على دراسات حقيقية:</b> سكان الرياض (تعداد 2022)، استهلاك الفرد المنشور 352.7 لتر، هدف 150، والتعرفة الرسمية. توزيع المناطق مُنمذج لإثبات المفهوم.",
+      s_kpi_input:"إجمالي الضخّ اليومي (م³)", s_kpi_billed:"المفوتَر عند المنازل (م³)",
+      s_kpi_loss:"الفاقد اليومي (م³)", s_kpi_losspct:"نسبة الفاقد", s_kpi_lpcd:"استهلاك الفرد (لتر) — الهدف 150",
+      s_bal_h2:"الميزان المائي حسب المنطقة",
+      s_bal_desc:"ماء دخل المنطقة (من المضخة) − مجموع عدادات المنازل = الفاقد. تجاوز 15% يُطلق إنذارًا ويحصر التسرب في تلك المنطقة.",
+      s_axis_losspct:"نسبة الفاقد %", s_threshold:"حد الإنذار 15%",
+      s_th_dma:"المنطقة", s_th_pop:"السكان", s_th_houses:"المنازل", s_th_lpcd:"لتر/فرد/يوم",
+      s_th_input:"الضخّ (م³/يوم)", s_th_billed:"المفوتَر (م³/يوم)", s_th_losspct:"الفاقد %", s_th_status:"الحالة",
+      s_status_alert:"إنذار تسرّب", s_status_ok:"سليم",
+      s_vision_h2:"الطريق لتحقيق رؤية 2030", s_vision_desc:"لو خفّضنا الاستهلاك إلى 150 لتر/فرد والفاقد إلى 10%، كم نوفّر؟",
+      s_vision_text:"الوضع الحالي: <b>{cur}</b> لتر/فرد وفاقد <b>{loss}%</b>. عند بلوغ الهدف (150 لتر وفاقد 10%) نوفّر <b>{water} م³</b> سنويًا ≈ <b>{low} – {high} ريال/سنة</b> (قيمة توضيحية).",
+      s_vision_cur:"الحالي", s_vision_target:"الهدف 2030",
+      s_sensor_h2:"عيّنة من بيانات الحساسات (كيف تُربط)",
+      s_sensor_desc:"كل حساس يبعث سلسلة زمنية. المسار: حساس → NB-IoT/LoRaWAN → MQTT → قاعدة بيانات زمنية → المحرك → اللوحة.",
+      s_sensor_house:"عدّادات المنازل", s_sensor_pump:"المضخات",
+      s_footer_note:"بيئة محاكاة لإثبات المفهوم — الأرقام مبنية على دراسات حقيقية لكن التوزيع على المناطق مُنمذج."
+    },
+    en: {
+      site_title:"Abunayyan — Water Loss Analytics",
+      brand:"Water Loss Analytics", brand_sub:"Analytics tool for Abunayyan Holding",
+      nav_real:"National Gap", nav_engine:"Leak Detection", lang_other:"العربية",
+      footer:"Prepared as a preliminary analysis tool for an Abunayyan Holding presentation — real published data in the “National Gap” tab, illustrative simulation in the “Leak Detection” tab.",
+      r_h1:"The water-consumption gap between Saudi regions and the Vision 2030 target",
+      r_lede:"This dashboard is built <b>entirely</b> on officially published figures: the 2022 census, per-capita consumption from a peer-reviewed study, the official tariff, and a published network-loss estimate. Every figure is traceable in Sources.",
+      r_disclaimer:"<b>Methodological note:</b> the “financial value” is illustrative = excess volume × a real tariff — not an actual lost-revenue figure documented by any utility, because network loss is un-billed.",
+      r_kpi1_label:"National consumption above the 2030 target", r_kpi1_sub:"m³/year (2022 census)",
+      r_kpi2_label:"Illustrative value (lowest–highest tariff)", r_kpi2_sub:"0.15 – 9.00 SAR/m³",
+      r_kpi3_label:"Officially declared national network loss", r_kpi3_sub:"m³/day — a published estimate",
+      r_s1_h2:"Daily per-capita consumption by region vs. the 2030 target",
+      r_s1_desc:"Coloured bars are figures published specifically per region; grey bars use the real national average instead of inventing a number.",
+      r_lg_confirmed:"Region-specific, published", r_lg_estimate:"National average (299 L)", r_lg_target:"2030 target (150 L/person/day)",
+      r_s2_h2:"Economic-gap table by region",
+      r_s2_desc:"Excess volume and its illustrative value if every region reached 150 L/person/day, by population and two real tariffs.",
+      r_th_region:"Region", r_th_pop:"Population (2022)", r_th_lpcd:"L/person/day", r_th_status:"Status",
+      r_th_excess_lpcd:"Excess over target (L)", r_th_excess_m3:"Excess volume (m³/year)",
+      r_th_val_low:"Value at lowest tariff", r_th_val_high:"Value at highest tariff",
+      r_s3_h2:"Sensitivity of the national-loss value by tariff tier",
+      r_s3_desc:"An official estimate puts national loss at 600–800k m³/day. The chart shows how its illustrative value changes by tier.",
+      r_scn_low:"Lower bound (600k m³/day)", r_scn_high:"Upper bound (800k m³/day)",
+      r_sources_h2:"Sources",
+      r_badge_on:"Confirmed", r_badge_off:"National average",
+      r_axis_lpcd:"L/person/day", r_axis_value:"Illustrative annual value (SAR)",
+      r_target_line:"2030 target: 150 L", r_per_year:"SAR/year",
+      u_billion:"billion", u_million:"million", u_sar:"SAR", u_m3:"m³",
+      e_h1:"Leak detection and its financial impact",
+      e_intro:"Builds a per-site baseline from its own past, flags anomalies statistically and economically, and turns them into SAR losses with a 30-day projection.",
+      e_kpi_loss:"Total financial loss (SAR)", e_kpi_days:"Leak days detected",
+      e_kpi_proj30:"Projected 30-day loss (SAR)", e_kpi_excess:"Total water wasted (m³)", e_kpi_zones:"Affected sites",
+      e_c1_h2:"Actual consumption vs. expected baseline",
+      e_c1_sub:"Pick a site to view its meter data — red marks are days where a probable leak was detected.",
+      e_lg_actual:"Actual consumption", e_lg_baseline:"Expected baseline", e_lg_leak:"Detected leak",
+      e_summary_h2:"Loss summary by site",
+      e_th_site:"Site", e_th_days:"Leak days", e_th_loss:"Loss (SAR)",
+      e_proj_h2:"Projected loss over the next 30 days", e_proj_sub:"Projected loss if any active leak stays untreated.",
+      e_proj_active:"Active leak", e_proj_ok:"No active leak", e_proj_text:"Projected additional loss over 30 days:",
+      e_note:"📊 Illustrative simulated data for four hypothetical sites (90-day window ending today) — not real operational data.",
+      e_tip_loss:"Loss",
+      nav_sim:"Network Simulation",
+      s_h1:"Smart-network simulation — the path to Vision 2030",
+      s_intro:"A modeled slice of Riyadh: source → pumps → District Metered Areas (DMAs) → a meter in every home, with a water-balance calculation.",
+      s_note:"<b>Grounded in real studies:</b> Riyadh population (2022 census), the published 352.7 L/day per-capita figure, the 150 target, and the official tariff. The split across districts is modeled to prove the concept.",
+      s_kpi_input:"Total daily pumped-in (m³)", s_kpi_billed:"Metered at homes (m³)",
+      s_kpi_loss:"Daily loss (m³)", s_kpi_losspct:"Loss ratio", s_kpi_lpcd:"Per-capita (L) — target 150",
+      s_bal_h2:"Water balance by district (DMA)",
+      s_bal_desc:"Water pumped INTO a DMA − sum of household meters = losses. Above 15% raises an alert and localizes the leak to that district.",
+      s_axis_losspct:"Loss ratio %", s_threshold:"Alert threshold 15%",
+      s_th_dma:"District", s_th_pop:"Population", s_th_houses:"Homes", s_th_lpcd:"L/person/day",
+      s_th_input:"Pumped-in (m³/day)", s_th_billed:"Metered (m³/day)", s_th_losspct:"Loss %", s_th_status:"Status",
+      s_status_alert:"Leak alert", s_status_ok:"Healthy",
+      s_vision_h2:"The path to Vision 2030", s_vision_desc:"If we cut demand to 150 L/person and losses to 10%, how much do we save?",
+      s_vision_text:"Now: <b>{cur}</b> L/person with <b>{loss}%</b> loss. Reaching the target (150 L and 10% loss) saves <b>{water} m³</b>/year ≈ <b>{low} – {high} SAR/year</b> (illustrative).",
+      s_vision_cur:"Now", s_vision_target:"2030 target",
+      s_sensor_h2:"Sample sensor data (how it connects)",
+      s_sensor_desc:"Each sensor emits a time series. Path: sensor → NB-IoT/LoRaWAN → MQTT → time-series DB → engine → dashboard.",
+      s_sensor_house:"Household meters", s_sensor_pump:"Pumps",
+      s_footer_note:"A proof-of-concept simulation — the figures are grounded in real studies, but the per-district split is modeled."
+    }
+  };
+
+  const REGION_NAMES = {"الرياض":"Riyadh","مكة المكرمة":"Makkah","المنطقة الشرقية":"Eastern Province","المدينة المنورة":"Madinah","عسير":"Asir","جازان":"Jazan","القصيم":"Qassim","تبوك":"Tabuk","حائل":"Hail","الجوف":"Al-Jawf","نجران":"Najran","الحدود الشمالية":"Northern Borders","الباحة":"Al-Bahah"};
+  const TIER_EN = {"0–15 م³/شهر":"0–15 m³/month","16–30 م³/شهر":"16–30 m³/month","31–45 م³/شهر":"31–45 m³/month","46–60 م³/شهر":"46–60 m³/month","أكثر من 60 م³/شهر":"Over 60 m³/month"};
+  const ZONE_NAMES = {
+    "Industrial Plant - Riyadh":{ar:"مصنع صناعي — الرياض",en:"Industrial Plant - Riyadh"},
+    "Commercial Complex - Dammam":{ar:"مجمع تجاري — الدمام",en:"Commercial Complex - Dammam"},
+    "Residential Compound - Jeddah":{ar:"مجمع سكني — جدة",en:"Residential Compound - Jeddah"},
+    "Desalination Feed Line - Jubail":{ar:"خط تغذية محطة تحلية — الجبيل",en:"Desalination Feed Line - Jubail"}
+  };
+
+  let lang = 'ar', tab = 'real', scenario = 'low';
+  try{ const s=localStorage.getItem('awl_lang'); if(s==='ar'||s==='en') lang=s; }catch(e){}
+
+  const T = () => I18N[lang];
+  const fmt = n => new Intl.NumberFormat('en-US').format(Math.round(n));
+  const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const regionName = r => lang==='ar' ? r : (REGION_NAMES[r]||r);
+  const tierName = t => lang==='ar' ? t : (TIER_EN[t]||t);
+  const zoneName = z => (ZONE_NAMES[z] && ZONE_NAMES[z][lang]) || z;
+  function compact(n, unit){ const t=T(); if(n>=1e9) return (n/1e9).toFixed(2)+' '+t.u_billion+' '+unit; if(n>=1e6) return (n/1e6).toFixed(1)+' '+t.u_million+' '+unit; return fmt(n)+' '+unit; }
+
+  if(window.Chart){ Chart.defaults.font.family='"Segoe UI",Tahoma,"Noto Sans Arabic",Arial,sans-serif'; Chart.defaults.font.size=11.5; }
+
+  /* ---------- REAL section ---------- */
+  function renderRealKpis(){
+    const t=T();
+    document.getElementById('r-excess-vol').textContent = compact(REAL.totals.total_excess_m3_per_year, t.u_m3);
+    document.getElementById('r-excess-value').textContent = compact(REAL.totals.total_excess_value_sar_low_tariff, t.u_sar)+' – '+compact(REAL.totals.total_excess_value_sar_high_tariff, t.u_sar);
+    document.getElementById('r-national-loss').textContent = fmt(REAL.national_loss_low_m3_day)+' – '+fmt(REAL.national_loss_high_m3_day);
+  }
+  function renderRegionTable(){
+    const t=T(), tb=document.getElementById('regionTableBody'); tb.innerHTML='';
+    REAL.regional.forEach(r=>{
+      const badge = r.data_confirmed ? '<span class="badge on">'+t.r_badge_on+'</span>' : '<span class="badge off">'+t.r_badge_off+'</span>';
+      const tr=document.createElement('tr');
+      tr.innerHTML = '<td>'+regionName(r.region)+'</td><td class="num">'+fmt(r.population_2022)+'</td><td class="num">'+r.lpcd_2022.toFixed(1)+'</td><td>'+badge+'</td><td class="num">'+r.excess_lpcd_vs_2030_target.toFixed(1)+'</td><td class="num">'+fmt(r.excess_m3_per_year)+'</td><td class="num">'+fmt(r.excess_value_sar_low_tariff)+'</td><td class="num">'+fmt(r.excess_value_sar_high_tariff)+'</td>';
+      tb.appendChild(tr);
+    });
+  }
+  function renderSources(){
+    const list=document.getElementById('sourcesList'); list.innerHTML='';
+    Object.values(REAL.sources).forEach(s=>{
+      const d=document.createElement('div'); d.className='src';
+      d.innerHTML = '<span>'+s.title+'</span><a dir="ltr" href="'+s.url+'" target="_blank" rel="noopener">'+s.url+'</a>';
+      list.appendChild(d);
+    });
+  }
+  let regionChart, nationalChart;
+  function buildRegionChart(){
+    if(!window.Chart) return; const t=T();
+    const sorted=[...REAL.regional].sort((a,b)=>b.lpcd_2022-a.lpcd_2022);
+    if(regionChart) regionChart.destroy();
+    regionChart = new Chart(document.getElementById('regionChart'), {
+      type:'bar',
+      data:{ labels:sorted.map(r=>regionName(r.region)),
+        datasets:[{ label:t.r_axis_lpcd, data:sorted.map(r=>r.lpcd_2022),
+          backgroundColor:sorted.map(r=>r.data_confirmed?cssVar('--accent'):cssVar('--muted')), borderRadius:4, maxBarThickness:34 }] },
+      options:{ responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{display:false}, tooltip:{ rtl:lang==='ar', callbacks:{ label:c=>c.parsed.y.toFixed(1)+' '+t.r_axis_lpcd } } },
+        scales:{ x:{ ticks:{color:cssVar('--muted')}, grid:{display:false} },
+                 y:{ ticks:{color:cssVar('--muted')}, grid:{color:cssVar('--line')} } } },
+      plugins:[{ id:'target', afterDraw(ch){ const {ctx,chartArea,scales}=ch; const y=scales.y.getPixelForValue(REAL.vision2030_target_lpcd); const rtl=lang==='ar';
+        ctx.save(); ctx.strokeStyle=cssVar('--danger'); ctx.setLineDash([6,5]); ctx.lineWidth=1.5;
+        ctx.beginPath(); ctx.moveTo(chartArea.left,y); ctx.lineTo(chartArea.right,y); ctx.stroke(); ctx.setLineDash([]);
+        ctx.fillStyle=cssVar('--danger'); ctx.font='11px "Segoe UI",sans-serif'; ctx.textAlign=rtl?'right':'left';
+        ctx.fillText(t.r_target_line, rtl?chartArea.right:chartArea.left, y-5); ctx.restore(); } }]
+    });
+  }
+  function buildNationalChart(){
+    if(!window.Chart) return; const t=T();
+    const daily = scenario==='low' ? REAL.national_loss_low_m3_day : REAL.national_loss_high_m3_day;
+    const rows = REAL.national_scenarios.filter(s=>s.daily_loss_m3===daily);
+    if(nationalChart) nationalChart.destroy();
+    nationalChart = new Chart(document.getElementById('nationalChart'), {
+      type:'bar',
+      data:{ labels:rows.map(r=>tierName(r.tariff_tier)),
+        datasets:[{ label:t.r_axis_value, data:rows.map(r=>r.illustrative_annual_value_sar), backgroundColor:cssVar('--accent'), borderRadius:4, maxBarThickness:42 }] },
+      options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{display:false}, tooltip:{ rtl:lang==='ar', callbacks:{ label:c=>fmt(c.parsed.x)+' '+t.r_per_year } } },
+        scales:{ x:{ ticks:{color:cssVar('--muted'), callback:v=>compact(v, t.u_sar)}, grid:{color:cssVar('--line')} },
+                 y:{ ticks:{color:cssVar('--muted')}, grid:{display:false} } } }
+    });
+  }
+
+  /* ---------- ENGINE section ---------- */
+  function defaultZoneId(){
+    const top = ENGINE.summary[0] && ENGINE.summary[0].zone_name;
+    const m = ENGINE.zones.find(z=>z.zone_name===top);
+    return (m&&m.zone_id) || (ENGINE.zones[0]&&ENGINE.zones[0].zone_id) || '';
+  }
+  const zoneSelect = document.getElementById('zoneSelect');
+  function buildZoneOptions(){
+    const prev = zoneSelect.value; zoneSelect.innerHTML='';
+    ENGINE.zones.forEach(z=>{ const o=document.createElement('option'); o.value=z.zone_id; o.textContent=zoneName(z.zone_name); zoneSelect.appendChild(o); });
+    const ok = prev && ENGINE.zones.some(z=>z.zone_id===prev);
+    zoneSelect.value = ok ? prev : defaultZoneId();
+  }
+  function renderEngineKpis(){
+    document.getElementById('e-loss').textContent = fmt(ENGINE.totals.total_loss_sar);
+    document.getElementById('e-days').textContent = fmt(ENGINE.totals.total_leak_days);
+    document.getElementById('e-proj30').textContent = fmt(ENGINE.totals.projected_30d_sar||0);
+    document.getElementById('e-excess').textContent = fmt(ENGINE.totals.total_excess_m3);
+    document.getElementById('e-zones').textContent = ENGINE.totals.zones_at_risk;
+  }
+  function renderSummary(activeId){
+    const activeName=(ENGINE.zones.find(z=>z.zone_id===activeId)||{}).zone_name;
+    const tb=document.getElementById('summaryBody'); tb.innerHTML='';
+    ENGINE.summary.forEach(row=>{
+      const tr=document.createElement('tr'); if(row.zone_name===activeName) tr.className='active';
+      tr.innerHTML='<td>'+zoneName(row.zone_name)+'</td><td class="num">'+fmt(row.leak_days_detected)+'</td><td class="num loss">'+fmt(row.total_financial_loss_sar)+'</td>';
+      tb.appendChild(tr);
+    });
+  }
+  function renderProjections(){
+    const t=T(), list=document.getElementById('projList'); list.innerHTML='';
+    ENGINE.zones.forEach(z=>{
+      const p=ENGINE.projections[z.zone_id]; const d=document.createElement('div');
+      if(p.active){ d.className='proj active'; d.innerHTML='<b>'+zoneName(z.zone_name)+'</b><span class="pill active">'+t.e_proj_active+'</span><br>'+t.e_proj_text+' <span class="amt">'+fmt(p.projected_30d_sar)+' '+t.u_sar+'</span>'; }
+      else { d.className='proj'; d.innerHTML='<b>'+zoneName(z.zone_name)+'</b><span class="pill ok">'+t.e_proj_ok+'</span>'; }
+      list.appendChild(d);
+    });
+  }
+  let consChart;
+  function buildConsChart(zoneId){
+    if(!window.Chart) return; const t=T(); const ts=ENGINE.timeseries[zoneId]; if(!ts) return;
+    const leakPts = ts.dates.map((d,i)=> ts.leak[i] ? ts.consumption[i] : null);
+    if(consChart) consChart.destroy();
+    consChart = new Chart(document.getElementById('consChart'), {
+      type:'line',
+      data:{ labels:ts.dates, datasets:[
+        { label:t.e_lg_actual, data:ts.consumption, borderColor:cssVar('--danger'), borderWidth:1.3, pointRadius:0, tension:.15 },
+        { label:t.e_lg_baseline, data:ts.baseline, borderColor:cssVar('--accent'), borderWidth:1.6, borderDash:[4,3], pointRadius:0, tension:.15 },
+        { label:t.e_lg_leak, data:leakPts, type:'scatter', borderColor:cssVar('--danger'), backgroundColor:cssVar('--danger'), pointStyle:'crossRot', pointRadius:4, pointBorderWidth:2, showLine:false }
+      ]},
+      options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
+        plugins:{ legend:{display:false}, tooltip:{ rtl:lang==='ar', callbacks:{ label:c=>c.dataset.label+': '+fmt(c.raw)+' '+t.u_m3 } } },
+        scales:{ x:{ ticks:{color:cssVar('--muted'), maxTicksLimit:8}, grid:{display:false} },
+                 y:{ ticks:{color:cssVar('--muted'), callback:v=>fmt(v)}, grid:{color:cssVar('--line')} } } }
+    });
+  }
+
+  function renderEngine(){ renderEngineKpis(); buildZoneOptions(); renderSummary(zoneSelect.value); renderProjections(); buildConsChart(zoneSelect.value); }
+  function renderReal(){ renderRealKpis(); renderRegionTable(); renderSources(); buildRegionChart(); buildNationalChart(); }
+
+  /* ---------- SIMULATION section ---------- */
+  let balanceChart, visionChart;
+  const dmaName = d => lang==='ar' ? d.name_ar : d.name_en;
+  const isAlert = d => d.leak_active || d.loss_pct > NET.meta.loss_threshold_pct;
+  function renderSimKpis(){
+    document.getElementById('s-input').textContent = fmt(NET.totals.input_m3_day);
+    document.getElementById('s-billed').textContent = fmt(NET.totals.billed_m3_day);
+    document.getElementById('s-loss').textContent = fmt(NET.totals.loss_m3_day);
+    document.getElementById('s-losspct').textContent = NET.totals.loss_pct + '%';
+    document.getElementById('s-lpcd').textContent = NET.totals.avg_lpcd + ' / 150';
+  }
+  function renderDmaTable(){
+    const t=T(), tb=document.getElementById('dmaBody'); tb.innerHTML='';
+    NET.dmas.forEach(d=>{
+      const alert = isAlert(d);
+      const badge = alert
+        ? '<span class="badge" style="color:var(--danger);border-color:var(--danger)">'+t.s_status_alert+'</span>'
+        : '<span class="badge on">'+t.s_status_ok+'</span>';
+      const tr=document.createElement('tr'); if(alert) tr.className='active';
+      tr.innerHTML='<td>'+dmaName(d)+'</td><td class="num">'+fmt(d.population)+'</td><td class="num">'+fmt(d.households)+'</td><td class="num">'+d.avg_lpcd+'</td><td class="num">'+fmt(d.input_m3_day)+'</td><td class="num">'+fmt(d.billed_m3_day)+'</td><td class="num">'+d.loss_pct+'%</td><td>'+badge+'</td>';
+      tb.appendChild(tr);
+    });
+  }
+  function buildBalanceChart(){
+    if(!window.Chart) return; const t=T();
+    if(balanceChart) balanceChart.destroy();
+    balanceChart = new Chart(document.getElementById('balanceChart'), {
+      type:'bar',
+      data:{ labels:NET.dmas.map(dmaName),
+        datasets:[{ label:t.s_axis_losspct, data:NET.dmas.map(d=>d.loss_pct),
+          backgroundColor:NET.dmas.map(d=> isAlert(d) ? cssVar('--danger') : cssVar('--accent')), borderRadius:4, maxBarThickness:48 }] },
+      options:{ responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{display:false}, tooltip:{ rtl:lang==='ar', callbacks:{ label:c=>c.parsed.y+'%' } } },
+        scales:{ x:{ ticks:{color:cssVar('--muted')}, grid:{display:false} },
+                 y:{ ticks:{color:cssVar('--muted'), callback:v=>v+'%'}, grid:{color:cssVar('--line')} } } },
+      plugins:[{ id:'thr', afterDraw(ch){ const {ctx,chartArea,scales}=ch; const y=scales.y.getPixelForValue(NET.meta.loss_threshold_pct); const rtl=lang==='ar';
+        ctx.save(); ctx.strokeStyle=cssVar('--warn'); ctx.setLineDash([6,5]); ctx.lineWidth=1.5;
+        ctx.beginPath(); ctx.moveTo(chartArea.left,y); ctx.lineTo(chartArea.right,y); ctx.stroke(); ctx.setLineDash([]);
+        ctx.fillStyle=cssVar('--warn'); ctx.font='11px "Segoe UI",sans-serif'; ctx.textAlign=rtl?'right':'left';
+        ctx.fillText(t.s_threshold, rtl?chartArea.right:chartArea.left, y-5); ctx.restore(); } }]
+    });
+  }
+  function buildVisionChart(){
+    if(!window.Chart) return; const t=T();
+    if(visionChart) visionChart.destroy();
+    visionChart = new Chart(document.getElementById('visionChart'), {
+      type:'bar',
+      data:{ labels:[t.s_vision_cur, t.s_vision_target],
+        datasets:[{ label:t.r_axis_lpcd, data:[NET.vision.current_lpcd, NET.vision.target_lpcd],
+          backgroundColor:[cssVar('--danger'), cssVar('--accent')], borderRadius:4, maxBarThickness:64 }] },
+      options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{display:false}, tooltip:{ rtl:lang==='ar', callbacks:{ label:c=>c.parsed.x+' '+t.r_axis_lpcd } } },
+        scales:{ x:{ ticks:{color:cssVar('--muted')}, grid:{color:cssVar('--line')} },
+                 y:{ ticks:{color:cssVar('--muted')}, grid:{display:false} } } }
+    });
+  }
+  function renderVisionText(){
+    const t=T(), v=NET.vision;
+    document.getElementById('visionText').innerHTML = t.s_vision_text
+      .replace('{cur}', v.current_lpcd).replace('{loss}', v.current_loss_pct)
+      .replace('{water}', fmt(v.water_saved_m3_year))
+      .replace('{low}', fmt(v.value_low_year)).replace('{high}', fmt(v.value_high_year));
+  }
+  function renderSensorSample(){
+    const h=document.getElementById('sensorHouse'); h.innerHTML='';
+    NET.sensor_sample.household.forEach(r=>{ const tr=document.createElement('tr');
+      tr.innerHTML='<td dir="ltr">'+r.ts+'</td><td>'+r.meter_id+'</td><td>'+r.house_id+'</td><td>'+r.dma+'</td><td class="num">'+r.reading_m3+'</td><td class="num">'+r.flow_lpm+'</td><td>'+r.status+'</td>'; h.appendChild(tr); });
+    const p=document.getElementById('sensorPump'); p.innerHTML='';
+    NET.sensor_sample.pump.forEach(r=>{ const tr=document.createElement('tr');
+      tr.innerHTML='<td dir="ltr">'+r.ts+'</td><td>'+r.pump_id+'</td><td>'+r.dma+'</td><td class="num">'+r.flow_out_m3h+'</td><td class="num">'+r.pressure_bar+'</td><td class="num">'+r.power_kw+'</td><td class="num">'+r.vibration+'</td><td>'+r.status+'</td>'; p.appendChild(tr); });
+  }
+  function renderSim(){ renderSimKpis(); renderDmaTable(); renderVisionText(); renderSensorSample(); buildBalanceChart(); buildVisionChart(); }
+
+  /* ---------- language + tabs ---------- */
+  function applyLang(l){
+    lang=l; const t=T();
+    document.documentElement.lang=l; document.documentElement.dir = l==='ar'?'rtl':'ltr';
+    document.querySelectorAll('[data-i18n]').forEach(el=>{ const k=el.getAttribute('data-i18n'); if(t[k]!==undefined) el.textContent=t[k]; });
+    document.querySelectorAll('[data-i18n-html]').forEach(el=>{ const k=el.getAttribute('data-i18n-html'); if(t[k]!==undefined) el.innerHTML=t[k]; });
+    document.getElementById('langToggle').textContent=t.lang_other;
+    try{ localStorage.setItem('awl_lang',l); }catch(e){}
+    renderReal(); renderEngine(); renderSim();
+  }
+  function switchTab(name){
+    tab=name;
+    document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===name));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('hidden', p.dataset.panel!==name));
+    // charts need a rebuild when their panel becomes visible (0-size while hidden)
+    if(window.Chart){
+      if(name==='real'){ buildRegionChart(); buildNationalChart(); }
+      else if(name==='engine'){ buildConsChart(zoneSelect.value); }
+      else if(name==='sim'){ buildBalanceChart(); buildVisionChart(); }
+    }
+  }
+
+  document.querySelectorAll('.tab').forEach(b=> b.addEventListener('click', ()=>switchTab(b.dataset.tab)));
+  document.querySelectorAll('.seg button').forEach(b=> b.addEventListener('click', ()=>{
+    scenario=b.dataset.scenario; document.querySelectorAll('.seg button').forEach(x=>x.classList.toggle('active', x===b)); buildNationalChart();
+  }));
+  zoneSelect.addEventListener('change', ()=>{ renderSummary(zoneSelect.value); buildConsChart(zoneSelect.value); });
+  document.getElementById('langToggle').addEventListener('click', ()=> applyLang(lang==='ar'?'en':'ar'));
+
+  applyLang(lang);
+  switchTab('real');
+})();
+</script>
+</body>
+</html>

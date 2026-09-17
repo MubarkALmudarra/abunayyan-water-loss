@@ -1,0 +1,283 @@
+{
+  "sources": {
+    "mdpi_consumption": {
+      "title": "Regional Heterogeneity in Urban Water Consumption in Saudi Arabia (MDPI Water, 2025)",
+      "url": "https://www.mdpi.com/2073-4441/17/8/1156"
+    },
+    "census_2022": {
+      "title": "تعداد السعودية 2022 - الهيئة العامة للإحصاء (عبر ويكيبيديا)",
+      "url": "https://ar.wikipedia.org/wiki/%D8%AA%D8%B9%D8%AF%D8%A7%D8%AF_%D8%A7%D9%84%D8%B3%D8%B9%D9%88%D8%AF%D9%8A%D8%A9_2022"
+    },
+    "tariff": {
+      "title": "التعرفة الجديدة للمياه وتوزيعها على الشرائح - أرقام",
+      "url": "https://www.argaam.com/ar/article/articledetail/id/416258"
+    },
+    "nrw_loss": {
+      "title": "Saudi Arabia's Water Sector - US-Saudi Business Council Economic Brief (Feb 2022)",
+      "url": "https://ussaudi.org/wp-content/uploads/2022/02/Water-2022-Economic-Brief.pdf"
+    },
+    "vision2030_target": {
+      "title": "National Water Strategy target (263L -> 150L by 2030), cited in US-Saudi Business Council brief",
+      "url": "https://ussaudi.org/wp-content/uploads/2022/02/Water-2022-Economic-Brief.pdf"
+    }
+  },
+  "national_avg_lpcd_2022": 299.0,
+  "national_avg_lpcd_2010": 272.0,
+  "vision2030_target_lpcd": 150.0,
+  "tariff_tiers": [
+    {
+      "tier": "0–15 م³/شهر",
+      "rate_sar_per_m3": 0.15
+    },
+    {
+      "tier": "16–30 م³/شهر",
+      "rate_sar_per_m3": 1.5
+    },
+    {
+      "tier": "31–45 م³/شهر",
+      "rate_sar_per_m3": 4.5
+    },
+    {
+      "tier": "46–60 م³/شهر",
+      "rate_sar_per_m3": 6.0
+    },
+    {
+      "tier": "أكثر من 60 م³/شهر",
+      "rate_sar_per_m3": 9.0
+    }
+  ],
+  "national_loss_low_m3_day": 600000,
+  "national_loss_high_m3_day": 800000,
+  "regional": [
+    {
+      "region": "المنطقة الشرقية",
+      "population_2022": 5125254,
+      "lpcd_2022": 368.0,
+      "data_confirmed": true,
+      "note": "رقم منشور بالتحديد لعام 2022",
+      "excess_lpcd_vs_2030_target": 218.0,
+      "excess_m3_per_year": 407816461,
+      "excess_value_sar_low_tariff": 61172469,
+      "excess_value_sar_high_tariff": 3670348147
+    },
+    {
+      "region": "الرياض",
+      "population_2022": 8591748,
+      "lpcd_2022": 352.7,
+      "data_confirmed": true,
+      "note": "رقم منشور بالتحديد لعام 2022",
+      "excess_lpcd_vs_2030_target": 202.7,
+      "excess_m3_per_year": 635664772,
+      "excess_value_sar_low_tariff": 95349716,
+      "excess_value_sar_high_tariff": 5720982945
+    },
+    {
+      "region": "مكة المكرمة",
+      "population_2022": 8021463,
+      "lpcd_2022": 299.0,
+      "data_confirmed": false,
+      "note": "لا يوجد رقم إقليمي منشور — تم استخدام المتوسط الوطني الحقيقي لعام 2022 بدلاً من اختراع رقم",
+      "excess_lpcd_vs_2030_target": 149.0,
+      "excess_m3_per_year": 436247265,
+      "excess_value_sar_low_tariff": 65437090,
+      "excess_value_sar_high_tariff": 3926225387
+    },
+    {
+      "region": "المدينة المنورة",
+      "population_2022": 2137983,
+      "lpcd_2022": 299.0,
+      "data_confirmed": false,
+      "note": "لا يوجد رقم إقليمي منشور — تم استخدام المتوسط الوطني الحقيقي لعام 2022 بدلاً من اختراع رقم",
+      "excess_lpcd_vs_2030_target": 149.0,
+      "excess_m3_per_year": 116274205,
+      "excess_value_sar_low_tariff": 17441131,
+      "excess_value_sar_high_tariff": 1046467849
+    },
+    {
+      "region": "القصيم",
+      "population_2022": 1336179,
+      "lpcd_2022": 299.0,
+      "data_confirmed": false,
+      "note": "لا يوجد رقم إقليمي منشور — تم استخدام المتوسط الوطني الحقيقي لعام 2022 بدلاً من اختراع رقم",
+      "excess_lpcd_vs_2030_target": 149.0,
+      "excess_m3_per_year": 72668095,
+      "excess_value_sar_low_tariff": 10900214,
+      "excess_value_sar_high_tariff": 654012854
+    },
+    {
+      "region": "الباحة",
+      "population_2022": 339174,
+      "lpcd_2022": 299.0,
+      "data_confirmed": false,
+      "note": "لا يوجد رقم إقليمي منشور — تم استخدام المتوسط الوطني الحقيقي لعام 2022 بدلاً من اختراع رقم",
+      "excess_lpcd_vs_2030_target": 149.0,
+      "excess_m3_per_year": 18445978,
+      "excess_value_sar_low_tariff": 2766897,
+      "excess_value_sar_high_tariff": 166013802
+    },
+    {
+      "region": "تبوك",
+      "population_2022": 886036,
+      "lpcd_2022": 299.0,
+      "data_confirmed": false,
+      "note": "لا يوجد رقم إقليمي منشور — تم استخدام المتوسط الوطني الحقيقي لعام 2022 بدلاً من اختراع رقم",
+      "excess_lpcd_vs_2030_target": 149.0,
+      "excess_m3_per_year": 48187068,
+      "excess_value_sar_low_tariff": 7228060,
+      "excess_value_sar_high_tariff": 433683611
+    },
+    {
+      "region": "حائل",
+      "population_2022": 746406,
+      "lpcd_2022": 299.0,
+      "data_confirmed": false,
+      "note": "لا يوجد رقم إقليمي منشور — تم استخدام المتوسط الوطني الحقيقي لعام 2022 بدلاً من اختراع رقم",
+      "excess_lpcd_vs_2030_target": 149.0,
+      "excess_m3_per_year": 40593290,
+      "excess_value_sar_low_tariff": 6088994,
+      "excess_value_sar_high_tariff": 365339613
+    },
+    {
+      "region": "الجوف",
+      "population_2022": 595822,
+      "lpcd_2022": 299.0,
+      "data_confirmed": false,
+      "note": "لا يوجد رقم إقليمي منشور — تم استخدام المتوسط الوطني الحقيقي لعام 2022 بدلاً من اختراع رقم",
+      "excess_lpcd_vs_2030_target": 149.0,
+      "excess_m3_per_year": 32403779,
+      "excess_value_sar_low_tariff": 4860567,
+      "excess_value_sar_high_tariff": 291634015
+    },
+    {
+      "region": "الحدود الشمالية",
+      "population_2022": 373577,
+      "lpcd_2022": 299.0,
+      "data_confirmed": false,
+      "note": "لا يوجد رقم إقليمي منشور — تم استخدام المتوسط الوطني الحقيقي لعام 2022 بدلاً من اختراع رقم",
+      "excess_lpcd_vs_2030_target": 149.0,
+      "excess_m3_per_year": 20316985,
+      "excess_value_sar_low_tariff": 3047548,
+      "excess_value_sar_high_tariff": 182852866
+    },
+    {
+      "region": "نجران",
+      "population_2022": 592300,
+      "lpcd_2022": 143.2,
+      "data_confirmed": true,
+      "note": "رقم منشور بالتحديد لعام 2022 (الأدنى وطنيًا)",
+      "excess_lpcd_vs_2030_target": 0.0,
+      "excess_m3_per_year": 0,
+      "excess_value_sar_low_tariff": 0,
+      "excess_value_sar_high_tariff": 0
+    },
+    {
+      "region": "عسير",
+      "population_2022": 2024285,
+      "lpcd_2022": 118.0,
+      "data_confirmed": false,
+      "note": "الورقة العلمية تذكر 'أقل من 120 لتر' دون رقم دقيق منشور — استخدمنا 118 كتقدير متحفظ ضمن هذا النطاق المذكور",
+      "excess_lpcd_vs_2030_target": 0.0,
+      "excess_m3_per_year": 0,
+      "excess_value_sar_low_tariff": 0,
+      "excess_value_sar_high_tariff": 0
+    },
+    {
+      "region": "جازان",
+      "population_2022": 1404997,
+      "lpcd_2022": 118.0,
+      "data_confirmed": false,
+      "note": "الورقة العلمية تذكر 'أقل من 120 لتر' دون رقم دقيق منشور — استخدمنا 118 كتقدير متحفظ ضمن هذا النطاق المذكور",
+      "excess_lpcd_vs_2030_target": 0.0,
+      "excess_m3_per_year": 0,
+      "excess_value_sar_low_tariff": 0,
+      "excess_value_sar_high_tariff": 0
+    }
+  ],
+  "national_scenarios": [
+    {
+      "loss_scenario": "الحد الأدنى المنشور (600 ألف م³/يوم)",
+      "daily_loss_m3": 600000,
+      "annual_loss_m3": 219000000,
+      "tariff_tier": "0–15 م³/شهر",
+      "tariff_rate": 0.15,
+      "illustrative_annual_value_sar": 32850000
+    },
+    {
+      "loss_scenario": "الحد الأدنى المنشور (600 ألف م³/يوم)",
+      "daily_loss_m3": 600000,
+      "annual_loss_m3": 219000000,
+      "tariff_tier": "16–30 م³/شهر",
+      "tariff_rate": 1.5,
+      "illustrative_annual_value_sar": 328500000
+    },
+    {
+      "loss_scenario": "الحد الأدنى المنشور (600 ألف م³/يوم)",
+      "daily_loss_m3": 600000,
+      "annual_loss_m3": 219000000,
+      "tariff_tier": "31–45 م³/شهر",
+      "tariff_rate": 4.5,
+      "illustrative_annual_value_sar": 985500000
+    },
+    {
+      "loss_scenario": "الحد الأدنى المنشور (600 ألف م³/يوم)",
+      "daily_loss_m3": 600000,
+      "annual_loss_m3": 219000000,
+      "tariff_tier": "46–60 م³/شهر",
+      "tariff_rate": 6.0,
+      "illustrative_annual_value_sar": 1314000000
+    },
+    {
+      "loss_scenario": "الحد الأدنى المنشور (600 ألف م³/يوم)",
+      "daily_loss_m3": 600000,
+      "annual_loss_m3": 219000000,
+      "tariff_tier": "أكثر من 60 م³/شهر",
+      "tariff_rate": 9.0,
+      "illustrative_annual_value_sar": 1971000000
+    },
+    {
+      "loss_scenario": "الحد الأعلى المنشور (800 ألف م³/يوم)",
+      "daily_loss_m3": 800000,
+      "annual_loss_m3": 292000000,
+      "tariff_tier": "0–15 م³/شهر",
+      "tariff_rate": 0.15,
+      "illustrative_annual_value_sar": 43800000
+    },
+    {
+      "loss_scenario": "الحد الأعلى المنشور (800 ألف م³/يوم)",
+      "daily_loss_m3": 800000,
+      "annual_loss_m3": 292000000,
+      "tariff_tier": "16–30 م³/شهر",
+      "tariff_rate": 1.5,
+      "illustrative_annual_value_sar": 438000000
+    },
+    {
+      "loss_scenario": "الحد الأعلى المنشور (800 ألف م³/يوم)",
+      "daily_loss_m3": 800000,
+      "annual_loss_m3": 292000000,
+      "tariff_tier": "31–45 م³/شهر",
+      "tariff_rate": 4.5,
+      "illustrative_annual_value_sar": 1314000000
+    },
+    {
+      "loss_scenario": "الحد الأعلى المنشور (800 ألف م³/يوم)",
+      "daily_loss_m3": 800000,
+      "annual_loss_m3": 292000000,
+      "tariff_tier": "46–60 م³/شهر",
+      "tariff_rate": 6.0,
+      "illustrative_annual_value_sar": 1752000000
+    },
+    {
+      "loss_scenario": "الحد الأعلى المنشور (800 ألف م³/يوم)",
+      "daily_loss_m3": 800000,
+      "annual_loss_m3": 292000000,
+      "tariff_tier": "أكثر من 60 م³/شهر",
+      "tariff_rate": 9.0,
+      "illustrative_annual_value_sar": 2628000000
+    }
+  ],
+  "totals": {
+    "total_excess_m3_per_year": 1828617898,
+    "total_excess_value_sar_low_tariff": 274292686,
+    "total_excess_value_sar_high_tariff": 16457561089
+  }
+}
