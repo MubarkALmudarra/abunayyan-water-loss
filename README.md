@@ -1,141 +1,132 @@
 # Water Loss Financial Impact Engine 💧
-### نظام تحليل الأثر المالي لتسربات المياه — لوحة تحليلية ثنائية اللغة (عربي/إنجليزي)
+### A bilingual (Arabic / English) water-loss analytics dashboard
 
-> A showcase project prepared for **Abunayyan Holding**, designed around
-> the company's own core water business (Abunayyan Trading, **Saudi Meters**,
-> **WETICO**) rather than as a generic data-science demo.
+> A showcase project prepared for **Abunayyan Holding**, built around the
+> company's core water business (Abunayyan Trading, **Saudi Meters**, **WETICO**)
+> rather than as a generic data-science demo.
 
 **🔗 Live demo:** https://incredible-malasada-3fccf0.netlify.app
-_(انشر أحدث `index.html` على Netlify/GitHub Pages ليعرض الرابط النسخة الحالية: ٣ تبويبات، ثنائي اللغة، بيانات محدّثة.)_
+_(Redeploy the latest `index.html` to Netlify / GitHub Pages so the link shows the current version: 3 tabs, bilingual, updated data.)_
 
-<!-- بعد رفع لقطة شاشة باسم preview.png، احذف علامات التعليق من السطر التالي ليظهر الصورة -->
+<!-- Add a screenshot named preview.png, then uncomment: -->
 <!-- ![preview](preview.png) -->
 
-## نبذة سريعة | What it is
+## What it is
 
-صفحة ويب واحدة (`index.html`) تجمع **ثلاثة تبويبات**، تعمل بلا إنترنت وثنائية اللغة (زر «English / العربية»، RTL/LTR):
+A single, self-contained web page (`index.html`) with **three tabs**, fully
+offline-capable and **bilingual** (an «English / العربية» switch that flips the
+whole interface between LTR and RTL at runtime):
 
-- **الفجوة الوطنية | National Gap** — بيانات **حقيقية منشورة رسميًا**: فجوة استهلاك المياه بين المناطق السعودية مقابل هدف رؤية 2030، وقيمتها الاقتصادية التوضيحية حسب التعرفة الرسمية.
-- **كشف التسربات | Leak Detection** — محرّك يبني خط أساس طبيعي لكل موقع، يكشف الشذوذ (إحصائيًا + اقتصاديًا)، يحوّله **خسارة بالريال**، ويتوقّع خسارة الـ 30 يوم القادمة لو لم يُعالج (على بيانات محاكاة).
-- **محاكاة الشبكة | Network Simulation** — بيئة مُنمذجة لشريحة من الرياض (مصدر → مضخات → مناطق DMA → عدّاد لكل منزل) مبنية على الدراسات الحقيقية، تُطبّق **الميزان المائي** لكشف الفاقد وتحصره في منطقته، وتوضّح **الطريق لتحقيق رؤية 2030** وعيّنة من بيانات الحساسات.
+- **National Gap** — **officially published real data**: the water-consumption
+  gap between Saudi regions and the Vision 2030 target, and its illustrative
+  economic value at the official tariff.
+- **Leak Detection** — an engine that builds a per-site baseline, flags
+  anomalies (statistically **and** economically), converts each into a **SAR
+  loss**, and projects the next 30 days of loss if a leak is left untreated
+  (on simulated meter data).
+- **Network Simulation** — a modeled slice of Riyadh (source → pumps → District
+  Metered Areas → a meter per home) grounded in the real studies. It applies the
+  **water balance** to detect and localize losses to a district, and shows the
+  **path to Vision 2030** plus a sample sensor feed.
 
-**التقنيات:** Python (pandas / numpy) للتحليل، Streamlit للّوحات التفاعلية، وصفحة HTML/JS + Chart.js مكتفية بذاتها للنشر. بدون أي اعتماد سحابي خارجي وقت التشغيل.
+**Tech:** Python (pandas / numpy) for the analysis, Streamlit for the interactive
+dashboards, and a self-contained HTML / JS + Chart.js page for deployment — with
+no external cloud dependency at runtime.
 
-## ⚠️ تحديث مهم: طبقتان منفصلتان في هذا المشروع
+## ⚠️ Two clearly separated layers
 
-بعد المراجعة، تقرر فصل المشروع بوضوح إلى طبقتين حتى لا يُفهم أي رقم على أنه حقيقي وهو ليس كذلك:
+The project is deliberately split so no number is mistaken for something it isn't:
 
-1. **الطبقة الحقيقية (`real_data.py`, `real_analysis.py`, `real_dashboard.py`)** — بيانات حقيقية 100% منشورة رسميًا: تعداد السكان 2022، استهلاك الفرد اليومي الحقيقي لكل منطقة، التعرفة الرسمية، وفاقد الشبكة الوطني المُعلن. **هذه هي الطبقة التي يجب عرضها على الشركة.** شغّلها بـ: `streamlit run real_dashboard.py`.
-2. **طبقة المحرك (`generate_data.py`, `analysis.py`, `dashboard.py`)** — خوارزمية كشف انحرافات على مستوى العداد الفردي، **مُختبرة على بيانات محاكاة** لعدم توفر تليمترية عدادات حقيقية كبيانات مفتوحة في السعودية حاليًا. الكود جاهز هندسيًا لكنه **لا يمثّل نتائج حقيقية** — لا تعرضه على أنه كذلك. راجع `PRESENTATION_NOTES.md`.
+1. **Real layer** (`real_data.py`, `real_analysis.py`, `real_dashboard.py`) —
+   100% officially published data: the 2022 census, real per-capita consumption
+   per region, the official tariff tiers, and the declared national network loss.
+   **This is the layer to present to the company.** Run: `streamlit run real_dashboard.py`.
+2. **Engine layer** (`generate_data.py`, `analysis.py`, `dashboard.py`) — a
+   meter-level anomaly-detection algorithm **tested on simulated data**, because
+   real per-meter telemetry isn't available as open data in Saudi Arabia yet. The
+   code is engineering-ready but **does not represent real results** — it must not
+   be presented as such. See `PRESENTATION_NOTES.md`.
 
-> **الموقع الموحّد (`index.html`):** الطبقتان مدموجتان في **صفحة ويب واحدة ثنائية اللغة** بتبويبين («الفجوة الوطنية» + «كشف التسربات»)، بلا تكرار، تُبنى من `site_template.html` عبر `python build_html.py`، وتشتغل بلا إنترنت (Chart.js محلي في `vendor/`). هذي الصفحة هي المناسبة للنشر على GitHub Pages. أما لوحات Streamlit فهي النسخة التفاعلية للتشغيل المحلي (لا تعمل على GitHub Pages لأنها تحتاج سيرفر بايثون).
+> **Unified site (`index.html`):** both layers plus the network simulation are
+> merged into **one bilingual page** with three tabs (no duplication), built from
+> `site_template.html` via `python build_html.py`, and it runs with no internet
+> (Chart.js is inlined). This page is the one to host on GitHub Pages. The
+> Streamlit dashboards are the interactive local version — they can't run on
+> GitHub Pages because they need a Python server.
 
----
+## Methodology (brief)
 
-## لماذا هذا المشروع تحديداً لأبونيان؟
+1. **Baseline:** a trailing, backward-looking rolling-median per site — it only
+   ever sees the past, exactly as a live on-premise monitor would.
+2. **Anomaly detection:** a day is flagged as a probable leak only when it is
+   both a statistical outlier (a robust, MAD-based z-score that a sustained leak
+   can't suppress) **and** economically significant (more than 15% over baseline)
+   — which cuts false alarms.
+3. **Financial conversion:** excess volume × each site's water tariff (SAR/m³) =
+   daily loss, summed to monthly / annual.
+4. **Projection:** if a leak is active in the final days of the data, project the
+   additional loss over the next 30 days if it stays unresolved.
 
-أبونيان القابضة تمتلك تاريخياً أعمق حضور في قطاع المياه بالمنطقة عبر:
+Precision / Recall are **computed live** in `evaluate.py` (never hardcoded):
+currently ~100% precision / ~69% recall on the simulated data — these will change
+on real, noisier data. Run `python evaluate.py` to see the current values.
 
-- **Saudi Meters** — أول مُصنّع عدادات مياه في المنطقة (يعني بيانات استهلاك يومية ضخمة تُجمع أصلاً)
-- **WETICO** — من أكبر 15 شركة تحلية ومعالجة مياه عالمياً
-- **Abunayyan Trading** — موزّع رئيسي لحلول المياه والصرف الصحي منذ 1950
-
-هذي البيانات (قراءات العدادات) موجودة أصلاً عندهم — لكن الفجوة عادة تكون في **تحويلها لقرار مالي واضح**: "كم نخسر بالريال هذا الشهر بسبب تسرب في هذا الموقع، وكم سنخسر إضافياً لو ما عالجناه؟". هذا بالضبط ما يحله هذا المشروع.
-
-## الفكرة (Executive Summary)
-
-نظام يأخذ قراءات عدادات مياه يومية من عدة مواقع (صناعي/تجاري/سكني/تحلية)، يبني **خط أساس متوقع** للاستهلاك الطبيعي، يكتشف الانحرافات (تسربات محتملة) إحصائياً، ثم **يحوّل كل قطرة مهدرة إلى تكلفة مالية بالريال السعودي** حسب تعرفة كل موقع — ويعرض توقعاً للخسارة المستقبلية إذا استمر التسرب دون معالجة.
-
-النتيجة: لوحة تحكم تنفيذية تجاوب على سؤال الإدارة المالية مباشرة، لا سؤال تقني.
-
-## لماذا "معتمد على سيرفرات الشركة" (On-Premise)؟
-
-الكود بالكامل مبني بدون أي اعتماد على خدمة سحابية خارجية (لا Cloud API، لا استدعاء إنترنت وقت التشغيل):
-
-- التحليل (`analysis.py`) مكتبات بايثون قياسية فقط (pandas/numpy)
-- اللوحة (`dashboard.py`) خادم Streamlit محلي يعمل داخل شبكة الشركة
-- `Dockerfile` جاهز لتغليف النظام كخدمة داخلية على أي سيرفر تملكه الشركة، بدون إرسال أي بيانات تشغيلية حساسة خارج الشبكة الداخلية — نقطة مهمة لشركة تدير بنية تحتية حساسة (مياه/طاقة/محطات تحلية)
-
-## هيكل المشروع
+## Project structure
 
 ```
-├── generate_data.py      # يولّد بيانات محاكاة لآخر 90 يوم تنتهي اليوم (ديناميكي)
-├── analysis.py           # المحرك: Baseline + كشف الشذوذ + التحويل المالي + توقع 30 يوم (+ يبني dashboard_data.json)
-├── evaluate.py           # تقييم دقة الكشف (Precision/Recall) — تُحسب فعليًا لا ثابتة
-├── real_data.py / real_analysis.py   # بيانات وتحليل حقيقي منشور (+ يبني real_dashboard_data.json)
-├── generate_network_data.py  # يحاكي شبكة (مصدر→مضخات→DMA→منازل) + ميزان مائي (+ network_data.json)
-├── dashboard.py / real_dashboard.py  # لوحتا Streamlit تفاعليتان — ثنائيتا اللغة (عربي/إنجليزي)
-├── i18n.py               # الترجمة المشتركة + مبدّل اللغة + اتجاه RTL/LTR للوحتَي Streamlit
-├── site_template.html    # قالب الموقع الموحّد (٣ تبويبات، ثنائي اللغة)
-├── build_html.py         # يبني index.html الموحّد من القالب + ملفات JSON الثلاثة
-├── index.html            # الموقع الموحّد الجاهز (يُنشر على GitHub Pages)
-├── export_powerbi.py     # يصدّر ملفات CSV نظيفة إلى powerbi/ للاستيراد في Power BI
-├── powerbi/              # ملفات CSV (UTF-8) + دليل استيراد Power BI
-├── vendor/chart.umd.min.js  # Chart.js محليًا (بدون CDN) ليعمل بلا إنترنت
-├── requirements.txt / Dockerfile / .nojekyll
+├── generate_data.py            # dynamic simulated data for the last 90 days ending today
+├── analysis.py                 # engine: baseline + anomaly detection + SAR conversion + 30-day projection (writes dashboard_data.json)
+├── evaluate.py                 # Precision/Recall vs. ground truth (computed, not hardcoded)
+├── real_data.py / real_analysis.py     # real published data + analysis (writes real_dashboard_data.json)
+├── generate_network_data.py    # simulates source→pumps→DMAs→home-meters + water balance (writes network_data.json)
+├── dashboard.py / real_dashboard.py    # two interactive Streamlit dashboards — bilingual
+├── i18n.py                     # shared translations + language switch + RTL/LTR for the Streamlit apps
+├── site_template.html          # template for the unified site (3 tabs, bilingual)
+├── build_html.py               # builds the unified index.html from the template + the 3 JSON files
+├── index.html                  # the ready unified site (host on GitHub Pages)
+├── export_powerbi.py           # exports clean CSVs to powerbi/ for Power BI import
+├── powerbi/                    # CSV files (UTF-8) + a Power BI import guide
+├── vendor/chart.umd.min.js     # Chart.js locally (no CDN) so it runs with no internet
+└── requirements.txt / Dockerfile / .nojekyll
 ```
 
-> **ثنائية اللغة (عربي/إنجليزي):** كل الواجهات (لوحتا Streamlit + الموقع الموحّد)
-> تدعم التبديل الفوري بين العربية (RTL) والإنجليزية (LTR) عبر زر «English / العربية»،
-> دون إعادة تشغيل.
+## Run
 
-## النشر على GitHub Pages ورفع المشروع
-
-الموقع الموحّد `index.html` صفحة ثابتة، فتُنشر مجانًا على GitHub Pages:
-
-1. أنشئ مستودعًا على GitHub وارفع محتويات هذا المجلد (عبر واجهة GitHub، أو `git` لو مثبّت).
-2. في المستودع: **Settings → Pages → Source = فرع `main`، المجلد الجذر (root)** → Save.
-3. بعد دقيقة يعطيك رابطًا مثل `https://<username>.github.io/<repo>/` — هذا هو الدومين.
-4. المشاركة: أرسل الرابط، أو أضف الشخص عبر **Settings → Collaborators**.
-
-ملاحظة: لوحات Streamlit لا تعمل على GitHub Pages (تحتاج سيرفر بايثون) — لنشرها استخدم **Streamlit Community Cloud** المجاني.
-
-## Power BI
-
-لا توجد مكتبة بايثون تعرض البيانات داخل Power BI بدون حساب/رخصة. الطريقة العملية = استيراد ملفات CSV نظيفة:
-
-```bash
-python export_powerbi.py     # يكتب ملفات CSV (UTF-8) في مجلد powerbi/
-```
-
-ثم في Power BI Desktop: **Get Data → Text/CSV** واستورد ملفات `powerbi/` (فيه دليل `powerbi/HOW_TO_IMPORT.md` بالعربي والإنجليزي).
-
-## طريقة التشغيل
-
-> **على ويندوز استخدم `py` بدل `python`** (لأن `python` قد يفتح متجر مايكروسوفت).
+> **On Windows use `py` instead of `python`** (a bare `python` may open the Microsoft Store).
 
 ```bash
 pip install -r requirements.txt
-python generate_data.py      # يولّد بيانات محاكاة لآخر 90 يوم تنتهي اليوم
-python analysis.py           # ملخص الخسائر + توقع 30 يوم (+ يبني dashboard_data.json)
-python real_analysis.py      # يبني بيانات الطبقة الحقيقية (real_dashboard_data.json)
-python generate_network_data.py  # يبني بيانات محاكاة الشبكة (network_data.json)
-python evaluate.py           # يقيّم دقة النموذج (Precision/Recall فعلية)
-python build_html.py         # يبني الموقع الموحّد index.html (٣ تبويبات)
-streamlit run real_dashboard.py   # اللوحة التفاعلية على http://localhost:8501
+python generate_data.py           # simulated data for the last 90 days ending today
+python analysis.py                # loss summary + 30-day projection (+ dashboard_data.json)
+python real_analysis.py           # builds the real-layer data (real_dashboard_data.json)
+python generate_network_data.py   # builds the network-simulation data (network_data.json)
+python evaluate.py                # evaluates the model (real Precision/Recall)
+python build_html.py              # builds the unified index.html (3 tabs)
+streamlit run real_dashboard.py   # the interactive dashboard at http://localhost:8501
 ```
 
-لعرض الموقع الموحّد: افتح `index.html` مباشرة، أو قدّمه بخادم بسيط (`python -m http.server`).
+To view the unified site: open `index.html` directly, or serve it with `python -m http.server`.
 
-أو عبر Docker مباشرة كخدمة داخلية:
+## Deploy to GitHub Pages
+
+`index.html` is a static, self-contained page, so it hosts for free on GitHub Pages:
+
+1. In the repo: **Settings → Pages → Source = branch `main`, folder `/root`** → Save.
+2. You get a link like `https://<username>.github.io/<repo>/`.
+
+The Streamlit apps can't run on GitHub Pages (they need a Python server) — use the free **Streamlit Community Cloud** for those.
+
+## Power BI
+
+There is no Python library that renders data inside Power BI without an account /
+license. The practical path is importing clean CSVs:
 
 ```bash
-docker build -t water-loss-engine .
-docker run -p 8501:8501 water-loss-engine
+python export_powerbi.py     # writes UTF-8 CSVs into powerbi/
 ```
 
-## المنهجية التقنية باختصار
-
-1. **خط الأساس (Baseline):** متوسط وسيط متحرك (Rolling Median) *تراجعي فقط* (لا يرى المستقبل) — يحاكي كيف سيعمل النظام فعلياً في بيئة حية.
-2. **كشف الشذوذ:** يوم يُصنّف كتسرب محتمل فقط إذا كان شاذاً إحصائياً (Z-score) **و** الفائض كبير اقتصادياً (أكثر من 15% من الأساس) — لتقليل الإنذارات الكاذبة.
-3. **التحويل المالي:** حجم المياه الزائد × تعرفة الموقع (SAR/m³) = خسارة يومية، تُجمع لخسارة شهرية/سنوية.
-4. **التوقع المستقبلي:** إذا كان هناك تسرب نشط في آخر 7 أيام من البيانات، يُحسب إسقاط للخسارة المتوقعة خلال 30 يوماً قادمة إن لم يُعالج.
-
-الأرقام تُحسب فعليًا في `evaluate.py` (ليست ثابتة مكتوبة يدويًا). على البيانات التجريبية الحالية (نافذة 90 يوم تنتهي اليوم) يحقق النظام دقة (Precision) ~100% واستدعاء (Recall) ~69% — والأرقام قابلة للتغيّر والتحسين بمجرد ربطه ببيانات حقيقية وتاريخ صيانة فعلي (بدل المحاكاة). شغّل `python evaluate.py` لرؤية القيم الحالية بنفسك.
-
-## خطوة تالية مقترحة لأبونيان
-
-ربط `generate_data.py` مباشرة بمصدر بيانات حقيقي (تصدير CSV دوري من نظام Saudi Meters AMI أو قاعدة بيانات SCADA داخلية)، دون أي تعديل على `analysis.py` أو `dashboard.py` — النظام مصمم أصلاً ليكون مصدر البيانات قابل للاستبدال بسهولة (Plug-and-play).
+Then in Power BI Desktop: **Get Data → Text/CSV** and import the `powerbi/` files
+(a bilingual guide is in `powerbi/HOW_TO_IMPORT.md`).
 
 ---
 *Prepared by Mubarak Almudarra — Computer Science (Artificial Intelligence) graduate.*
